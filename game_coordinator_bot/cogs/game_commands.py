@@ -107,8 +107,12 @@ class GameCommands(commands.Cog):
             mode=mode.name if mode else None
         )
         
-        # Send the announcement
-        await interaction.response.send_message(embed=embed)
+        # Send the announcement with @everyone ping
+        await interaction.response.send_message(
+            content="@everyone",
+            embed=embed,
+            allowed_mentions=discord.AllowedMentions(everyone=True)
+        )
         
         logger.info(
             f"Gaming session created by {interaction.user.name}: "
