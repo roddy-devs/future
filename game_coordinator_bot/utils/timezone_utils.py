@@ -4,9 +4,10 @@ Timezone utilities for the Game Coordinator Bot.
 Provides timezone conversion and formatting for gaming sessions.
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, List, TYPE_CHECKING
 import pytz
+import re
 
 if TYPE_CHECKING:
     from discord import app_commands
@@ -62,9 +63,6 @@ def parse_time_input(time_str: str, timezone_str: str) -> Optional[datetime]:
         # Parse common time formats
         time_lower = time_str.lower().strip()
         
-        # Try parsing "8pm", "8:30pm", etc.
-        import re
-        
         # Try 12-hour format first (8pm, 8:30pm)
         match_12h = re.match(r'^(\d{1,2})(?::(\d{2}))?\s*(am|pm)$', time_lower)
         if match_12h:
@@ -84,7 +82,6 @@ def parse_time_input(time_str: str, timezone_str: str) -> Optional[datetime]:
             
             # If the time is in the past, assume it's for tomorrow
             if parsed_time < now:
-                from datetime import timedelta
                 tomorrow = now + timedelta(days=1)
                 parsed_time = tz.localize(datetime(
                     tomorrow.year, tomorrow.month, tomorrow.day, hour, minute
@@ -108,7 +105,6 @@ def parse_time_input(time_str: str, timezone_str: str) -> Optional[datetime]:
             
             # If the time is in the past, assume it's for tomorrow
             if parsed_time < now:
-                from datetime import timedelta
                 tomorrow = now + timedelta(days=1)
                 parsed_time = tz.localize(datetime(
                     tomorrow.year, tomorrow.month, tomorrow.day, hour, minute
@@ -119,50 +115,6 @@ def parse_time_input(time_str: str, timezone_str: str) -> Optional[datetime]:
         return None
     except Exception:
         return None
-
-
-def format_time_with_conversions(dt: datetime, original_tz: str, show_conversions: bool = True) -> str:
-    """
-    Format datetime with timezone conversions.
-    
-    Args:
-        dt: datetime object with timezone
-        original_tz: Original timezone name
-        show_conversions: Whether to show conversions to other timezones
-    
-    Returns:
-        Formatted time string with conversions
-    """
-    if not dt:
-        return "Time not specified"
-    
-    # Format the original time
-    time_str = dt.strftime("%I:%M %p").lstrip("0")
-    tz_abbr = dt.strftime("%Z")
-    result = f"{time_str} {tz_abbr}"
-    
-    if show_conversions:
-        # Add conversions to other common timezones
-        conversions = []
-        target_timezones = ["US/Eastern", "US/Pacific", "Europe/London", "UTC"]
-        
-        for tz_name in target_timezones:
-            if tz_name == original_tz:
-                continue
-            
-            try:
-                tz = pytz.timezone(tz_name)
-                converted = dt.astimezone(tz)
-                conv_time = converted.strftime("%I:%M %p").lstrip("0")
-                conv_abbr = converted.strftime("%Z")
-                conversions.append(f"{conv_time} {conv_abbr}")
-            except Exception:
-                continue
-        
-        if conversions:
-            result += "\n" + " | ".join(conversions)
-    
-    return result
 
 
 def get_unix_timestamp(dt: Optional[datetime]) -> Optional[int]:
