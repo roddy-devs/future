@@ -1,0 +1,16 @@
+[Unit]
+Description=Game Coordinator Discord Bot
+After=network.target
+
+[Service]
+Type=simple
+User=ec2-user
+WorkingDirectory=/home/ec2-user/future
+ExecStart=/usr/bin/python3 -m game_coordinator_bot.bot
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
