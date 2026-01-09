@@ -10,7 +10,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from game_coordinator_bot.utils.config import get_game_config, GameType
+from game_coordinator_bot.utils.config import get_game_config
 
 logger = logging.getLogger('game_coordinator.commands')
 
@@ -146,11 +146,6 @@ class GameCommands(commands.Cog):
             text=f"Organized by {user.name}",
             icon_url=user.display_avatar.url
         )
-        
-        # Add thumbnail based on game
-        if game == "Call of Duty":
-            # Using a generic gaming controller emoji as thumbnail
-            embed.set_thumbnail(url=user.display_avatar.url)
         
         return embed
 
