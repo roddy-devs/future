@@ -56,6 +56,12 @@ async def load_extensions():
     """Load all cogs/extensions."""
     await bot.load_extension('game_coordinator_bot.cogs.game_commands')
     logger.info('Loaded game_commands cog')
+    
+    # If guild-specific, copy commands to that guild
+    if GUILD_ID:
+        guild = discord.Object(id=int(GUILD_ID))
+        bot.tree.copy_global_to(guild=guild)
+        logger.info(f'Copied commands to guild {GUILD_ID}')
 
 
 async def main():
