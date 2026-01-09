@@ -6,7 +6,7 @@ This document provides real-world examples of using the Game Coordinator Bot.
 
 **Command:**
 ```
-/play game:Call of Duty time:8pm EST platform:PC mode:Zombies
+/play game:Call of Duty time:8pm timezone:US Eastern platform:PC mode:Zombies
 ```
 
 **Result:**
@@ -17,10 +17,13 @@ This document provides real-world examples of using the Game Coordinator Bot.
 
 🎯 Game: Call of Duty - Zombies
 🖥️ Platform: PC
-⏰ Time: 8pm EST
+⏰ Time: Saturday, January 11, 2026 at 8:00 PM
+       in 2 hours
 
-Organized by username
+Organized by username • US Eastern (EST/EDT)
 ```
+
+**Note:** Discord automatically shows the time in each viewer's local timezone!
 
 **Embed Color:** Dark Red
 
@@ -30,7 +33,7 @@ Organized by username
 
 **Command:**
 ```
-/play game:Overcooked time:tomorrow at 3pm platform:Nintendo Switch
+/play game:Overcooked time:8:30pm timezone:US Pacific platform:Nintendo Switch
 ```
 
 **Result:**
@@ -41,10 +44,13 @@ Organized by username
 
 🎯 Game: Overcooked
 🖥️ Platform: Nintendo Switch
-⏰ Time: tomorrow at 3pm
+⏰ Time: Saturday, January 11, 2026 at 8:30 PM
+       in 3 hours
 
-Organized by username
+Organized by username • US Pacific (PST/PDT)
 ```
+
+**Note:** Users in different timezones will see the time converted to their local timezone automatically!
 
 **Embed Color:** Orange
 
@@ -54,7 +60,7 @@ Organized by username
 
 **Command:**
 ```
-/play game:Call of Duty time:in 2 hours platform:Cross-platform mode:Multiplayer
+/play game:Call of Duty time:20:00 timezone:UTC platform:Cross-platform mode:Multiplayer
 ```
 
 **Result:**
@@ -65,10 +71,13 @@ Organized by username
 
 🎯 Game: Call of Duty - Multiplayer
 🖥️ Platform: Cross-platform
-⏰ Time: in 2 hours
+⏰ Time: Saturday, January 11, 2026 at 8:00 PM
+       in 4 hours
 
-Organized by username
+Organized by username • UTC
 ```
+
+**Note:** Users in Eastern time will see "3:00 PM EST", users in Pacific time will see "12:00 PM PST", etc.
 
 **Embed Color:** Dark Red
 
@@ -78,7 +87,7 @@ Organized by username
 
 **Command:**
 ```
-/play game:Call of Duty time:Saturday 7pm platform:PlayStation mode:Endgame
+/play game:Call of Duty time:7pm timezone:Europe/London platform:PlayStation mode:Endgame
 ```
 
 **Result:**
@@ -89,61 +98,86 @@ Organized by username
 
 🎯 Game: Call of Duty - Endgame
 🖥️ Platform: PlayStation
-⏰ Time: Saturday 7pm
+⏰ Time: Saturday, January 11, 2026 at 7:00 PM
+       in 5 hours
 
-Organized by username
+Organized by username • UK (GMT/BST)
 ```
 
 **Embed Color:** Dark Red
 
 ---
 
+## Timezone Conversion Examples
+
+The bot's timezone feature means everyone sees the time in their own timezone:
+
+**Example:** You schedule for `8pm US Eastern`
+- **US Eastern users see:** 8:00 PM EST
+- **US Pacific users see:** 5:00 PM PST
+- **UK users see:** 1:00 AM GMT
+- **Japan users see:** 10:00 AM JST
+
+This eliminates confusion and makes it easy to coordinate across timezones!
+
+---
+
 ## Common Use Cases
 
-### Coordinating with Friends
+### Coordinating with Friends Across Timezones
 ```
-User: /play game:Overcooked time:tonight at 9pm platform:PC
-Bot: [Posts embed]
-Friends: React with 👍 or reply to join
+User in New York: /play game:Overcooked time:9pm timezone:US Eastern platform:PC
+Bot: [Posts embed showing 9pm EST for New York, 6pm PST for California, etc.]
+Friends: Everyone sees the time in their own timezone automatically!
 ```
 
 ### Planning Ahead
 ```
-User: /play game:Call of Duty time:Friday night 8pm EST platform:Xbox mode:Zombies
+User: /play game:Call of Duty time:8pm timezone:US Pacific platform:Xbox mode:Zombies
 Bot: [Posts embed]
-Others: See the announcement days in advance
+Others: See the announcement with time automatically converted to their timezone
 ```
 
 ### Last-Minute Sessions
 ```
-User: /play game:Call of Duty time:now platform:Cross-platform mode:Multiplayer
+User: /play game:Call of Duty time:20:00 timezone:UTC platform:Cross-platform mode:Multiplayer
 Bot: [Posts embed]
-Friends: Jump in immediately
+Friends: See it in their local time and can jump in
 ```
 
 ---
 
-## Time Format Flexibility
+## Time Format Guide
 
-The bot accepts any text for the time field. Here are examples that work well:
+The bot accepts simple time formats:
 
-### Specific Times
-- `8pm EST`
-- `20:00 UTC`
-- `3:30pm PST`
+### 12-Hour Format (with am/pm)
+- `8pm` → 8:00 PM
+- `8:30pm` → 8:30 PM
+- `9:15am` → 9:15 AM
 
-### Relative Times
-- `in 30 minutes`
-- `in 2 hours`
-- `in an hour`
+### 24-Hour Format
+- `20:00` → 8:00 PM
+- `14:30` → 2:30 PM
+- `09:00` → 9:00 AM
 
-### Date and Time
-- `tomorrow at 3pm`
-- `Saturday 7pm`
-- `next Friday at 8pm`
-- `Jan 15 at 9pm`
+**Important:** Always select your timezone so the bot can convert the time for other users!
 
-### Casual Descriptions
+---
+
+## Supported Timezones
+
+- **US Eastern (EST/EDT)** - New York, Washington DC
+- **US Central (CST/CDT)** - Chicago, Dallas
+- **US Mountain (MST/MDT)** - Denver, Phoenix
+- **US Pacific (PST/PDT)** - Los Angeles, Seattle
+- **UK (GMT/BST)** - London
+- **Central Europe (CET/CEST)** - Paris, Berlin
+- **Eastern Europe (EET/EEST)** - Helsinki, Athens
+- **Japan (JST)** - Tokyo
+- **Korea (KST)** - Seoul
+- **Australia East (AEDT/AEST)** - Sydney, Melbourne
+- **UTC** - Universal Coordinated Time
 - `tonight`
 - `later today`
 - `this weekend`

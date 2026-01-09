@@ -11,6 +11,11 @@ from discord import app_commands
 from discord.ext import commands
 
 from game_coordinator_bot.utils.config import get_game_config
+from game_coordinator_bot.utils.timezone_utils import (
+    get_timezone_choices,
+    parse_time_input,
+    get_unix_timestamp,
+)
 
 logger = logging.getLogger('game_coordinator.commands')
 
@@ -27,7 +32,8 @@ class GameCommands(commands.Cog):
     )
     @app_commands.describe(
         game="Choose the game you want to play",
-        time="When do you want to play? (e.g., '8pm EST', 'in 2 hours', 'tomorrow at 3pm')",
+        time="What time? (e.g., '8pm', '8:30pm', '20:00')",
+        timezone="Your timezone",
         platform="What platform will you play on?",
         mode="Game mode (Call of Duty only)"
     )
@@ -35,6 +41,7 @@ class GameCommands(commands.Cog):
         app_commands.Choice(name="Call of Duty", value="call_of_duty"),
         app_commands.Choice(name="Overcooked", value="overcooked"),
     ])
+    @app_commands.choices(timezone=get_timezone_choices())
     @app_commands.choices(platform=[
         app_commands.Choice(name="PC", value="pc"),
         app_commands.Choice(name="PlayStation", value="playstation"),
@@ -52,6 +59,7 @@ class GameCommands(commands.Cog):
         interaction: discord.Interaction,
         game: app_commands.Choice[str],
         time: str,
+        timezone: app_commands.Choice[str],
         platform: app_commands.Choice[str],
         mode: Optional[app_commands.Choice[str]] = None
     ):
@@ -61,7 +69,8 @@ class GameCommands(commands.Cog):
         Args:
             interaction: Discord interaction object
             game: Selected game
-            time: When to play
+            time: When to play (time string)
+            timezone: User's timezone
             platform: Gaming platform
             mode: Game mode (optional, required for Call of Duty)
         """
@@ -76,12 +85,24 @@ class GameCommands(commands.Cog):
             )
             return
         
+        # Parse the time with timezone
+        parsed_time = parse_time_input(time, timezone.value)
+        
+        if not parsed_time:
+            await interaction.response.send_message(
+                f"❌ Could not parse time '{time}'. Please use formats like '8pm', '8:30pm', or '20:00'.",
+                ephemeral=True
+            )
+            return
+        
         # Create embed for the gaming session announcement
         embed = self._create_session_embed(
             user=interaction.user,
             game=game.name,
             game_value=game.value,
-            time=time,
+            parsed_time=parsed_time,
+            timezone_name=timezone.value,
+            timezone_display=timezone.name,
             platform=platform.name,
             mode=mode.name if mode else None
         )
@@ -91,7 +112,7 @@ class GameCommands(commands.Cog):
         
         logger.info(
             f"Gaming session created by {interaction.user.name}: "
-            f"{game.name} on {platform.name} at {time}"
+            f"{game.name} on {platform.name} at {time} {timezone.name}"
             + (f" ({mode.name})" if mode else "")
         )
     
@@ -100,7 +121,9 @@ class GameCommands(commands.Cog):
         user: discord.User,
         game: str,
         game_value: str,
-        time: str,
+        parsed_time,
+        timezone_name: str,
+        timezone_display: str,
         platform: str,
         mode: Optional[str] = None
     ) -> discord.Embed:
@@ -111,7 +134,9 @@ class GameCommands(commands.Cog):
             user: User who created the session
             game: Game display name
             game_value: Game value/ID
-            time: When to play
+            parsed_time: Parsed datetime object with timezone
+            timezone_name: Timezone name (e.g., "US/Eastern")
+            timezone_display: Timezone display name
             platform: Gaming platform
             mode: Game mode (optional)
         
@@ -138,12 +163,19 @@ class GameCommands(commands.Cog):
         # Add platform field
         embed.add_field(name="🖥️ Platform", value=platform, inline=True)
         
-        # Add time field
-        embed.add_field(name="⏰ Time", value=time, inline=True)
+        # Add time field with Discord timestamp (auto-converts to user's timezone)
+        timestamp = get_unix_timestamp(parsed_time)
+        if timestamp:
+            # Discord timestamp formatting: <t:timestamp:F> shows full date/time in user's local timezone
+            time_display = f"<t:{timestamp}:F>\n<t:{timestamp}:R>"
+        else:
+            time_display = "Time not specified"
+        
+        embed.add_field(name="⏰ Time", value=time_display, inline=False)
         
         # Add footer with user avatar
         embed.set_footer(
-            text=f"Organized by {user.name}",
+            text=f"Organized by {user.name} • {timezone_display}",
             icon_url=user.display_avatar.url
         )
         

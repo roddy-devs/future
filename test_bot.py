@@ -7,9 +7,15 @@ Validates the bot's core functionality without requiring a live Discord connecti
 
 import sys
 from typing import Optional
+from datetime import datetime
 from game_coordinator_bot.utils.config import (
     GameType, Platform, GameConfig, GameMode,
     get_game_config, get_all_games, get_platform_name
+)
+from game_coordinator_bot.utils.timezone_utils import (
+    parse_time_input,
+    get_unix_timestamp,
+    COMMON_TIMEZONES,
 )
 
 
@@ -126,6 +132,53 @@ def test_embed_data_structure():
     print(f"✓ Overcooked embed data: {embed_data_overcooked['game']} (no mode)")
 
 
+def test_timezone_functionality():
+    """Test timezone utilities."""
+    print("\n=== Testing Timezone Functionality ===")
+    
+    # Test timezone choices data
+    assert len(COMMON_TIMEZONES) > 0, "No timezone choices found"
+    print(f"✓ Loaded {len(COMMON_TIMEZONES)} timezone choices")
+    
+    # Test that common timezones are present
+    assert "US/Eastern" in COMMON_TIMEZONES
+    assert "US/Pacific" in COMMON_TIMEZONES
+    assert "Europe/London" in COMMON_TIMEZONES
+    assert "UTC" in COMMON_TIMEZONES
+    print(f"✓ Common timezones present: US/Eastern, US/Pacific, Europe/London, UTC")
+    
+    # Test time parsing
+    test_cases = [
+        ("8pm", "US/Eastern"),
+        ("8:30pm", "US/Eastern"),
+        ("20:00", "UTC"),
+        ("9:15pm", "US/Pacific"),
+    ]
+    
+    for time_str, tz in test_cases:
+        parsed = parse_time_input(time_str, tz)
+        assert parsed is not None, f"Failed to parse '{time_str}' with timezone {tz}"
+        print(f"✓ Successfully parsed '{time_str}' in {tz}")
+    
+    # Test invalid time parsing
+    invalid_parsed = parse_time_input("invalid time", "US/Eastern")
+    assert invalid_parsed is None, "Should return None for invalid time"
+    print(f"✓ Invalid time correctly returns None")
+    
+    # Test unix timestamp generation
+    parsed_time = parse_time_input("8pm", "US/Eastern")
+    if parsed_time:
+        timestamp = get_unix_timestamp(parsed_time)
+        assert timestamp is not None, "Failed to generate timestamp"
+        assert isinstance(timestamp, int), "Timestamp should be an integer"
+        print(f"✓ Generated Unix timestamp: {timestamp}")
+    
+    # Test None timestamp
+    none_timestamp = get_unix_timestamp(None)
+    assert none_timestamp is None, "None should return None timestamp"
+    print(f"✓ None timestamp correctly returns None")
+
+
 def main():
     """Run all tests."""
     print("=" * 60)
@@ -137,6 +190,7 @@ def main():
         test_platform_names()
         test_command_validation_logic()
         test_embed_data_structure()
+        test_timezone_functionality()
         
         print("\n" + "=" * 60)
         print("✅ All tests passed!")

@@ -10,10 +10,12 @@ A Discord bot for coordinating gaming sessions with friends. Built with discord.
 
 - **Slash Command `/play`**: Coordinate gaming sessions with friends
   - Select from multiple games (Call of Duty, Overcooked)
-  - Specify time for the session
+  - Specify time and timezone for the session
+  - **Automatic timezone conversion**: Times are displayed in each user's local timezone
   - Choose platform (PC, PlayStation, Xbox, Nintendo Switch, Cross-platform)
   - Game-specific modes (for Call of Duty: Zombies, Multiplayer, Endgame)
 - **Clean Embeds**: Beautiful announcements with color-coded game information
+- **Timezone Support**: 11+ timezones supported with automatic conversion
 - **Modular Design**: Easily extensible for future features like per-game notification subscriptions
 
 ### Setup
